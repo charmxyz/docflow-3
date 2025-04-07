@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import {
   Background,
   ReactFlow,
@@ -9,6 +9,11 @@ import {
   Panel,
   useNodesState,
   useEdgesState,
+  Connection,
+  Edge,
+  Node,
+  Controls,
+  MiniMap,
 } from '@xyflow/react';
 import dagre from '@dagrejs/dagre';
 import Image from 'next/image';
@@ -21,6 +26,7 @@ import CustomInputNode from './CustomInputNode';
 import CustomResultNode from './CustomResultNode';
 import BiomarkerNode from './BiomarkerNode';
 import { AnimatedSVGEdge } from './AnimatedSVGEdge';
+import { calculateDementiaRisk } from './calculations';
 
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
@@ -123,16 +129,16 @@ const Flow = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialHiddenEdges);
   const [animationStep, setAnimationStep] = useState(0);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [showBiomarkers, setShowBiomarkers] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const [showNoAction, setShowNoAction] = useState(false);
+  const [resultText, setResultText] = useState("");
+  const [noActionText, setNoActionText] = useState("");
+  const flowWrapper = useRef<HTMLDivElement>(null);
 
   const onConnect = useCallback(
-    (params: any) =>
-      setEdges((eds) =>
-        addEdge(
-          { ...params, type: ConnectionLineType.SmoothStep, animated: true },
-          eds,
-        ),
-      ),
-    [],
+    (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
   );
 
   const onLayout = useCallback(
@@ -182,42 +188,54 @@ const Flow = () => {
     );
   }, []);
 
-  const handleCalculate = useCallback(() => {
-    if (isCalculating) return;
-    
+  const handleCalculate = () => {
     setIsCalculating(true);
-    setAnimationStep(1);
-    
-    // Step 1: Animate edges from input nodes to patient name
-    updateEdgeTypes(['e1', 'e2', 'e3'], 'animated');
-    
-    // Step 2: After 4 seconds, show result node and animate edge to it
+    setShowResult(false);
+    setShowNoAction(false);
+
+    // Get input values
+    const ageNode = nodes.find((node) => node.id === "age");
+    const cognitiveNode = nodes.find((node) => node.id === "cognitive");
+    const familyNode = nodes.find((node) => node.id === "family");
+
+    const age = ageNode?.data?.value ? parseInt(ageNode.data.value) : 0;
+    const cognitiveScore = cognitiveNode?.data?.value
+      ? parseFloat(cognitiveNode.data.value)
+      : 0;
+    const familyHistory = familyNode?.data?.value === "yes";
+
+    // Calculate initial risk
+    const initialRisk = calculateDementiaRisk(age, cognitiveScore, familyHistory);
+
+    // Show biomarkers after a delay
     setTimeout(() => {
-      setAnimationStep(2);
-      showNodes(['result']);
-      showEdges(['e4']);
-      updateEdgeTypes(['e4'], 'animated');
-      
-      // Step 3: After 2 seconds, show all biomarker nodes
+      setShowBiomarkers(true);
+      setIsCalculating(false);
+
+      // Show result after biomarkers are visible
       setTimeout(() => {
-        setAnimationStep(3);
-        showNodes(['noAction', 'biomarker1', 'biomarker2', 'biomarker3', 'biomarker4', 'biomarker5', 'biomarker6']);
-        showEdges(['e5', 'e6', 'e7', 'e8', 'e9', 'e10', 'e11']);
-        
-        // Animate edge to Plasma pTau217
-        updateEdgeTypes(['e6'], 'animated');
-        
-        // Reset animation state after completion
-        setTimeout(() => {
-          setIsCalculating(false);
-          setAnimationStep(0);
-        }, 2000);
-      }, 2000);
-    }, 4000);
-  }, [isCalculating, updateEdgeTypes, showNodes, showEdges]);
+        setShowResult(true);
+        setResultText(
+          `Based on initial assessment, the patient's risk of dementia is ${initialRisk.toFixed(
+            1
+          )}%. Further biomarker testing is recommended.`
+        );
+
+        // Show no action node if risk is low
+        if (initialRisk < 15) {
+          setTimeout(() => {
+            setShowNoAction(true);
+            setNoActionText(
+              "Current risk level is low. Regular monitoring recommended."
+            );
+          }, 1000);
+        }
+      }, 1000);
+    }, 2000);
+  };
 
   return (
-    <div style={{ width: '100%', height: '100vh' }}>
+    <div ref={flowWrapper} style={{ width: '100%', height: '100vh' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -269,6 +287,8 @@ const Flow = () => {
           </div>
         </Panel>
         <Background />
+        <Controls />
+        <MiniMap />
       </ReactFlow>
     </div>
   );

@@ -1,7 +1,7 @@
-import { Position } from '@xyflow/react';
+import { Position } from "@xyflow/react";
 
 const position = { x: 0, y: 0 };
-const edgeType = 'smoothstep';
+const edgeType = "smoothstep";
 
 // Dementia estimation value (hardcoded for now)
 const dementiaEst = 50;
@@ -37,116 +37,103 @@ const amyloidPercentages = calculatePercentages(12, 0.15, dementiaEst);
 
 export const initialNodes = [
   {
-    id: 'age',
-    type: 'customInput',
-    data: { label: 'Age' },
-    position,
+    id: "age",
+    type: "customInput",
+    position: { x: 100, y: 100 },
+    data: { label: "Age" },
   },
   {
-    id: 'cognitive',
-    type: 'customInput',
-    data: { label: 'Cognitive Test Result' },
-    position,
+    id: "cognitive",
+    type: "customInput",
+    position: { x: 100, y: 200 },
+    data: { label: "Cognitive Test Result" },
   },
   {
-    id: 'family',
-    type: 'customInput',
-    data: { label: 'Family History' },
-    position,
+    id: "family",
+    type: "customInput",
+    position: { x: 100, y: 300 },
+    data: { label: "Family History" },
   },
   {
-    id: 'output',
-    type: 'default',
-    data: { label: 'Patient name: John' },
-    position,
+    id: "output",
+    type: "default",
+    position: { x: 400, y: 200 },
+    data: { label: "Patient name: John" },
   },
   {
-    id: 'result',
-    type: 'customResult',
-    data: { 
-      label: 'Result',
-      details: `Dementia Estimation: ${dementiaEst}%`
+    id: "result",
+    type: "customResult",
+    position: { x: 700, y: 200 },
+    data: {
+      label: "Result",
     },
-    position,
   },
   {
-    id: 'noAction',
-    type: 'default',
-    data: { label: 'No Action Needed' },
-    position,
+    id: "noAction",
+    type: "default",
+    position: { x: 1000, y: 200 },
+    data: { label: "No Action Needed" },
   },
   {
-    id: 'biomarker1',
-    type: 'biomarker',
-    data: { 
-      label: 'Plasma pTau217',
-      positivePercentage: pTauPercentages.positivePercentage,
-      negativePercentage: pTauPercentages.negativePercentage
+    id: "biomarker1",
+    type: "biomarker",
+    position: { x: 700, y: 100 },
+    data: {
+      label: "Plasma pTau217",
     },
-    position,
   },
   {
-    id: 'biomarker2',
-    type: 'biomarker',
-    data: { 
-      label: 'Neurofilament Light',
-      positivePercentage: nflPercentages.positivePercentage,
-      negativePercentage: nflPercentages.negativePercentage
+    id: "biomarker2",
+    type: "biomarker",
+    position: { x: 700, y: 150 },
+    data: {
+      label: "Neurofilament Light",
     },
-    position,
   },
   {
-    id: 'biomarker3',
-    type: 'biomarker',
-    data: { 
-      label: 'CSF AB 42:40 ratio',
-      positivePercentage: csfPercentages.positivePercentage,
-      negativePercentage: csfPercentages.negativePercentage
+    id: "biomarker3",
+    type: "biomarker",
+    position: { x: 700, y: 200 },
+    data: {
+      label: "CSF AB 42:40 ratio",
     },
-    position,
   },
   {
-    id: 'biomarker4',
-    type: 'biomarker',
-    data: { 
-      label: 'MRI Scan',
-      positivePercentage: mriPercentages.positivePercentage,
-      negativePercentage: mriPercentages.negativePercentage
+    id: "biomarker4",
+    type: "biomarker",
+    position: { x: 700, y: 250 },
+    data: {
+      label: "MRI Scan",
     },
-    position,
   },
   {
-    id: 'biomarker5',
-    type: 'biomarker',
-    data: { 
-      label: 'Amyloid PET',
-      positivePercentage: amyloidPercentages.positivePercentage,
-      negativePercentage: amyloidPercentages.negativePercentage
+    id: "biomarker5",
+    type: "biomarker",
+    position: { x: 700, y: 300 },
+    data: {
+      label: "Amyloid PET",
     },
-    position,
   },
   {
-    id: 'biomarker6',
-    type: 'biomarker',
-    data: { 
-      label: 'Plasma GFAP',
-      positivePercentage: gfapPercentages.positivePercentage,
-      negativePercentage: gfapPercentages.negativePercentage
+    id: "biomarker6",
+    type: "biomarker",
+    position: { x: 700, y: 350 },
+    data: {
+      label: "Plasma GFAP",
     },
-    position,
   },
 ];
 
 export const initialEdges = [
-  { id: 'e1', source: 'age', target: 'output', type: edgeType, animated: true },
-  { id: 'e2', source: 'cognitive', target: 'output', type: edgeType, animated: true },
-  { id: 'e3', source: 'family', target: 'output', type: edgeType, animated: true },
-  { id: 'e4', source: 'output', target: 'result', type: edgeType, animated: true },
-  { id: 'e5', source: 'result', target: 'noAction', type: edgeType, animated: true },
-  { id: 'e6', source: 'result', target: 'biomarker1', type: edgeType, animated: true },
-  { id: 'e7', source: 'result', target: 'biomarker2', type: edgeType, animated: true },
-  { id: 'e8', source: 'result', target: 'biomarker3', type: edgeType, animated: true },
-  { id: 'e9', source: 'result', target: 'biomarker4', type: edgeType, animated: true },
-  { id: 'e10', source: 'result', target: 'biomarker5', type: edgeType, animated: true },
-  { id: 'e11', source: 'result', target: 'biomarker6', type: edgeType, animated: true },
+  { id: "e1", source: "age", target: "output", type: edgeType, animated: true },
+  { id: "e2", source: "cognitive", target: "output", type: edgeType, animated: true },
+  { id: "e3", source: "family", target: "output", type: edgeType, animated: true },
+  { id: "e4", source: "output", target: "result", type: edgeType, animated: true },
+  { id: "e5", source: "result", target: "noAction", type: edgeType, animated: true },
+  { id: "e6", source: "result", target: "biomarker1", type: edgeType, animated: true },
+  { id: "e7", source: "result", target: "biomarker2", type: edgeType, animated: true },
+  { id: "e8", source: "result", target: "biomarker3", type: edgeType, animated: true },
+  { id: "e9", source: "result", target: "biomarker4", type: edgeType, animated: true },
+  { id: "e10", source: "result", target: "biomarker5", type: edgeType, animated: true },
+  { id: "e11", source: "result", target: "biomarker6", type: edgeType, animated: true },
 ]; 
