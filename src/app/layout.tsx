@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "React Flow with Dagre",
-  description: "A React Flow implementation with Dagre layout",
+  title: "Cogni | Alzheimers Disease Assistance for Healthworker",
+  description: "Interactive dementia risk assessment tool for healthcare providers",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -16,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={plusJakarta.className}>{children}</body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
