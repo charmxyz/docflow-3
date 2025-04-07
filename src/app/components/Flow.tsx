@@ -248,7 +248,7 @@ const Flow = () => {
               title="Vertical Layout"
             >
               <Image
-                src="/vertical-layout.svg"
+                src="/icons/ve.png"
                 alt="Vertical Layout"
                 width={24}
                 height={24}
@@ -260,7 +260,7 @@ const Flow = () => {
               title="Horizontal Layout"
             >
               <Image
-                src="/horizontal-layout.svg"
+                src="/icons/horizontal.png"
                 alt="Horizontal Layout"
                 width={24}
                 height={24}
