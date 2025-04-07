@@ -1,5 +1,5 @@
-import React from 'react';
-import { Handle, Position } from '@xyflow/react';
+import React from "react";
+import { Handle, Position } from "@xyflow/react";
 
 interface BiomarkerNodeProps {
   data: {
@@ -11,7 +11,7 @@ interface BiomarkerNodeProps {
 
 const BiomarkerNode = ({ data }: BiomarkerNodeProps) => {
   return (
-    <div className="react-flow__node" style={{ width: '143.1px' }}>
+    <div className="react-flow__node" style={{ width: "143.1px" }}>
       <Handle type="target" position={Position.Top} />
       <div className="flex flex-col">
         <div className="font-medium">{data.label}</div>

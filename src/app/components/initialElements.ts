@@ -39,88 +39,101 @@ export const initialNodes = [
   {
     id: "age",
     type: "customInput",
-    position: { x: 100, y: 100 },
     data: { label: "Age" },
+    position,
   },
   {
     id: "cognitive",
     type: "customInput",
-    position: { x: 100, y: 200 },
     data: { label: "Cognitive Test Result" },
+    position,
   },
   {
     id: "family",
     type: "customInput",
-    position: { x: 100, y: 300 },
     data: { label: "Family History" },
+    position,
   },
   {
     id: "output",
     type: "default",
-    position: { x: 400, y: 200 },
     data: { label: "Patient name: John" },
+    position,
   },
   {
     id: "result",
     type: "customResult",
-    position: { x: 700, y: 200 },
-    data: {
+    data: { 
       label: "Result",
+      details: `Dementia Estimation: ${dementiaEst}%`
     },
+    position,
   },
   {
     id: "noAction",
     type: "default",
-    position: { x: 1000, y: 200 },
     data: { label: "No Action Needed" },
+    position,
   },
   {
     id: "biomarker1",
     type: "biomarker",
-    position: { x: 700, y: 100 },
-    data: {
+    data: { 
       label: "Plasma pTau217",
+      positivePercentage: pTauPercentages.positivePercentage,
+      negativePercentage: pTauPercentages.negativePercentage
     },
+    position,
   },
   {
     id: "biomarker2",
     type: "biomarker",
-    position: { x: 700, y: 150 },
-    data: {
+    data: { 
       label: "Neurofilament Light",
+      positivePercentage: nflPercentages.positivePercentage,
+      negativePercentage: nflPercentages.negativePercentage
     },
+    position,
   },
   {
     id: "biomarker3",
     type: "biomarker",
-    position: { x: 700, y: 200 },
-    data: {
+    data: { 
       label: "CSF AB 42:40 ratio",
+      positivePercentage: csfPercentages.positivePercentage,
+      negativePercentage: csfPercentages.negativePercentage
     },
+    position,
   },
   {
     id: "biomarker4",
     type: "biomarker",
-    position: { x: 700, y: 250 },
-    data: {
+    data: { 
       label: "MRI Scan",
+      positivePercentage: mriPercentages.positivePercentage,
+      negativePercentage: mriPercentages.negativePercentage
     },
+    position,
   },
   {
     id: "biomarker5",
     type: "biomarker",
-    position: { x: 700, y: 300 },
-    data: {
+    data: { 
       label: "Amyloid PET",
+      positivePercentage: amyloidPercentages.positivePercentage,
+      negativePercentage: amyloidPercentages.negativePercentage
     },
+    position,
   },
   {
     id: "biomarker6",
     type: "biomarker",
-    position: { x: 700, y: 350 },
-    data: {
+    data: { 
       label: "Plasma GFAP",
+      positivePercentage: gfapPercentages.positivePercentage,
+      negativePercentage: gfapPercentages.negativePercentage
     },
+    position,
   },
 ];
 

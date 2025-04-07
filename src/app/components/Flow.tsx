@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useCallback, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect } from "react";
 import {
   Background,
   ReactFlow,
@@ -9,24 +9,18 @@ import {
   Panel,
   useNodesState,
   useEdgesState,
-  Connection,
-  Edge,
-  Node,
-  Controls,
-  MiniMap,
-} from '@xyflow/react';
-import dagre from '@dagrejs/dagre';
-import Image from 'next/image';
-import { PlayIcon } from '@heroicons/react/24/solid';
+} from "@xyflow/react";
+import dagre from "@dagrejs/dagre";
+import Image from "next/image";
+import { PlayIcon } from "@heroicons/react/24/solid";
 
-import '@xyflow/react/dist/style.css';
+import "@xyflow/react/dist/style.css";
 
-import { initialNodes, initialEdges } from './initialElements';
-import CustomInputNode from './CustomInputNode';
-import CustomResultNode from './CustomResultNode';
-import BiomarkerNode from './BiomarkerNode';
-import { AnimatedSVGEdge } from './AnimatedSVGEdge';
-import { calculateDementiaRisk } from './calculations';
+import { initialNodes, initialEdges } from "./initialElements";
+import CustomInputNode from "./CustomInputNode";
+import CustomResultNode from "./CustomResultNode";
+import BiomarkerNode from "./BiomarkerNode";
+import { AnimatedSVGEdge } from "./AnimatedSVGEdge";
 
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
@@ -51,13 +45,13 @@ const hide = (hidden: boolean) => (nodeOrEdge: any) => {
   };
 };
 
-const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
-  const isHorizontal = direction === 'LR';
+const getLayoutedElements = (nodes: any[], edges: any[], direction = "TB") => {
+  const isHorizontal = direction === "LR";
   dagreGraph.setGraph({ rankdir: direction });
 
   nodes.forEach((node) => {
     // Use double width for Family History node
-    const width = node.data.label === 'Family History' ? nodeWidth * 2 : nodeWidth;
+    const width = node.data.label === "Family History" ? nodeWidth * 2 : nodeWidth;
     dagreGraph.setNode(node.id, { width, height: nodeHeight });
   });
 
@@ -69,11 +63,11 @@ const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
 
   const newNodes = nodes.map((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
-    const width = node.data.label === 'Family History' ? nodeWidth * 2 : nodeWidth;
+    const width = node.data.label === "Family History" ? nodeWidth * 2 : nodeWidth;
     const newNode = {
       ...node,
-      targetPosition: isHorizontal ? 'left' : 'top',
-      sourcePosition: isHorizontal ? 'right' : 'bottom',
+      targetPosition: isHorizontal ? "left" : "top",
+      sourcePosition: isHorizontal ? "right" : "bottom",
       position: {
         x: nodeWithPosition.x - width / 2,
         y: nodeWithPosition.y - nodeHeight / 2,
@@ -84,7 +78,7 @@ const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
   });
 
   // Log positions for each node
-  console.log('Node Positions:');
+  console.log("Node Positions:");
   newNodes.forEach(node => {
     console.log(`${node.data.label}: x=${Math.round(node.position.x)}, y=${Math.round(node.position.y)}`);
   });
@@ -100,9 +94,9 @@ const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
 // Initially hide result and biomarker nodes
 const initialHiddenNodes = layoutedNodes.map(node => {
   if (
-    node.id === 'result' || 
-    node.id === 'noAction' || 
-    node.id.startsWith('biomarker')
+    node.id === "result" || 
+    node.id === "noAction" || 
+    node.id.startsWith("biomarker")
   ) {
     return { ...node, hidden: true };
   }
@@ -112,12 +106,12 @@ const initialHiddenNodes = layoutedNodes.map(node => {
 // Initially hide edges connected to hidden nodes
 const initialHiddenEdges = layoutedEdges.map(edge => {
   if (
-    edge.source === 'result' || 
-    edge.target === 'result' || 
-    edge.source === 'noAction' || 
-    edge.target === 'noAction' || 
-    edge.source.startsWith('biomarker') || 
-    edge.target.startsWith('biomarker')
+    edge.source === "result" || 
+    edge.target === "result" || 
+    edge.source === "noAction" || 
+    edge.target === "noAction" || 
+    edge.source.startsWith("biomarker") || 
+    edge.target.startsWith("biomarker")
   ) {
     return { ...edge, hidden: true };
   }
@@ -129,16 +123,16 @@ const Flow = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialHiddenEdges);
   const [animationStep, setAnimationStep] = useState(0);
   const [isCalculating, setIsCalculating] = useState(false);
-  const [showBiomarkers, setShowBiomarkers] = useState(false);
-  const [showResult, setShowResult] = useState(false);
-  const [showNoAction, setShowNoAction] = useState(false);
-  const [resultText, setResultText] = useState("");
-  const [noActionText, setNoActionText] = useState("");
-  const flowWrapper = useRef<HTMLDivElement>(null);
 
   const onConnect = useCallback(
-    (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
+    (params: any) =>
+      setEdges((eds) =>
+        addEdge(
+          { ...params, type: ConnectionLineType.SmoothStep, animated: true },
+          eds,
+        ),
+      ),
+    [],
   );
 
   const onLayout = useCallback(
@@ -188,54 +182,42 @@ const Flow = () => {
     );
   }, []);
 
-  const handleCalculate = () => {
+  const handleCalculate = useCallback(() => {
+    if (isCalculating) return;
+    
     setIsCalculating(true);
-    setShowResult(false);
-    setShowNoAction(false);
-
-    // Get input values
-    const ageNode = nodes.find((node) => node.id === "age");
-    const cognitiveNode = nodes.find((node) => node.id === "cognitive");
-    const familyNode = nodes.find((node) => node.id === "family");
-
-    const age = ageNode?.data?.value ? parseInt(ageNode.data.value) : 0;
-    const cognitiveScore = cognitiveNode?.data?.value
-      ? parseFloat(cognitiveNode.data.value)
-      : 0;
-    const familyHistory = familyNode?.data?.value === "yes";
-
-    // Calculate initial risk
-    const initialRisk = calculateDementiaRisk(age, cognitiveScore, familyHistory);
-
-    // Show biomarkers after a delay
+    setAnimationStep(1);
+    
+    // Step 1: Animate edges from input nodes to patient name
+    updateEdgeTypes(["e1", "e2", "e3"], "animated");
+    
+    // Step 2: After 4 seconds, show result node and animate edge to it
     setTimeout(() => {
-      setShowBiomarkers(true);
-      setIsCalculating(false);
-
-      // Show result after biomarkers are visible
+      setAnimationStep(2);
+      showNodes(["result"]);
+      showEdges(["e4"]);
+      updateEdgeTypes(["e4"], "animated");
+      
+      // Step 3: After 2 seconds, show all biomarker nodes
       setTimeout(() => {
-        setShowResult(true);
-        setResultText(
-          `Based on initial assessment, the patient's risk of dementia is ${initialRisk.toFixed(
-            1
-          )}%. Further biomarker testing is recommended.`
-        );
-
-        // Show no action node if risk is low
-        if (initialRisk < 15) {
-          setTimeout(() => {
-            setShowNoAction(true);
-            setNoActionText(
-              "Current risk level is low. Regular monitoring recommended."
-            );
-          }, 1000);
-        }
-      }, 1000);
-    }, 2000);
-  };
+        setAnimationStep(3);
+        showNodes(["noAction", "biomarker1", "biomarker2", "biomarker3", "biomarker4", "biomarker5", "biomarker6"]);
+        showEdges(["e5", "e6", "e7", "e8", "e9", "e10", "e11"]);
+        
+        // Animate edge to Plasma pTau217
+        updateEdgeTypes(["e6"], "animated");
+        
+        // Reset animation state after completion
+        setTimeout(() => {
+          setIsCalculating(false);
+          setAnimationStep(0);
+        }, 2000);
+      }, 2000);
+    }, 4000);
+  }, [isCalculating, updateEdgeTypes, showNodes, showEdges]);
 
   return (
-    <div ref={flowWrapper} style={{ width: '100%', height: '100vh' }}>
+    <div style={{ width: "100%", height: "100vh" }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -252,33 +234,33 @@ const Flow = () => {
           <button 
             onClick={handleCalculate}
             disabled={isCalculating}
-            className={`flex items-center gap-2 px-4 py-2 ${isCalculating ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded shadow transition-colors`}
+            className={`flex items-center gap-2 px-4 py-2 ${isCalculating ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"} text-white rounded shadow transition-colors`}
           >
             <PlayIcon className="h-5 w-5" />
-            <span>{isCalculating ? 'Calculating...' : 'Calculate'}</span>
+            <span>{isCalculating ? "Calculating..." : "Calculate"}</span>
           </button>
         </Panel>
         <Panel position="bottom-left">
           <div className="flex gap-2">
             <button 
-              onClick={() => onLayout('TB')}
+              onClick={() => onLayout("TB")}
               className="p-2 bg-white rounded shadow hover:bg-gray-50"
               title="Vertical Layout"
             >
               <Image
-                src="/icons/ve.png"
+                src="/vertical-layout.svg"
                 alt="Vertical Layout"
                 width={24}
                 height={24}
               />
             </button>
             <button 
-              onClick={() => onLayout('LR')}
+              onClick={() => onLayout("LR")}
               className="p-2 bg-white rounded shadow hover:bg-gray-50"
               title="Horizontal Layout"
             >
               <Image
-                src="/icons/horizontal.png"
+                src="/horizontal-layout.svg"
                 alt="Horizontal Layout"
                 width={24}
                 height={24}
@@ -287,8 +269,6 @@ const Flow = () => {
           </div>
         </Panel>
         <Background />
-        <Controls />
-        <MiniMap />
       </ReactFlow>
     </div>
   );

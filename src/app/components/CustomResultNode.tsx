@@ -1,22 +1,24 @@
-import React, { memo } from "react";
+import React from "react";
 import { Handle, Position } from "@xyflow/react";
 
-const CustomResultNode = ({ data }: { data: { label: string } }) => {
+interface CustomResultNodeProps {
+  data: {
+    label: string;
+    details: string;
+  };
+}
+
+const CustomResultNode = ({ data }: CustomResultNodeProps) => {
   return (
-    <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-stone-400">
-      <Handle type="target" position={Position.Top} className="w-16 !bg-teal-500" />
-      <div className="flex items-center">
-        <div className="ml-2">
-          <div className="text-lg font-bold">{data.label}</div>
-        </div>
+    <div className="react-flow__node" style={{ width: "143.1px" }}>
+      <Handle type="target" position={Position.Top} />
+      <div className="flex flex-col">
+        <div>{data.label}</div>
+        <div className="mt-2 text-xs text-gray-400">{data.details}</div>
       </div>
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="w-16 !bg-teal-500"
-      />
+      <Handle type="source" position={Position.Bottom} />
     </div>
   );
 };
 
-export default memo(CustomResultNode); 
+export default CustomResultNode; 
