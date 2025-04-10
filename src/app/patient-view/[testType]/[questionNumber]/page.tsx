@@ -1,5 +1,4 @@
 import { QuestionComponent } from './QuestionComponent';
-import { Metadata } from 'next';
 
 interface Question {
   id: number;
@@ -55,14 +54,11 @@ const questions: Question[] = [
   },
 ];
 
-type PageProps = {
-  params: {
-    testType: string;
-    questionNumber: string;
-  };
-};
-
-export default function Page({ params }: PageProps) {
+export default function Page({
+  params,
+}: {
+  params: { testType: string; questionNumber: string };
+}) {
   // Use URL parameters with fallback values
   const testType = params.testType || "ace";
   const questionNumber = parseInt(params.questionNumber, 10) || 1;
