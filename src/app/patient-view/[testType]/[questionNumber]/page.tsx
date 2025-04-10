@@ -70,6 +70,24 @@ const questions: Question[] = [
     type: "image",
     image: "/dot11.jpg",
   },
+  {
+    id: 12,
+    text: "Identify the letter",
+    type: "image",
+    image: "/letter12.jpg",
+  },
+  {
+    id: 13,
+    text: "Identify the letter",
+    type: "image",
+    image: "/letter13.jpg",
+  },
+  {
+    id: 14,
+    text: "Identify the letter",
+    type: "image",
+    image: "/letter14.jpg",
+  },
 ];
 
 export async function generateStaticParams() {
