@@ -54,13 +54,10 @@ const questions: Question[] = [
   },
 ];
 
-export default async function Page({
+export default function Page({
   params,
 }: {
-  params: {
-    testType: string;
-    questionNumber: string;
-  };
+  params: { testType: string; questionNumber: string }
 }) {
   const questionNumber = parseInt(params.questionNumber, 10);
   const currentQuestionData = questions[questionNumber - 1];
