@@ -63,8 +63,13 @@ type PageProps = {
 };
 
 export default function Page({ params }: PageProps) {
-  const questionNumber = parseInt(params.questionNumber, 10);
+  // Use URL parameters with fallback values
+  const testType = params.testType || "ace";
+  const questionNumber = parseInt(params.questionNumber, 10) || 1;
   const currentQuestionData = questions[questionNumber - 1];
 
-  return <QuestionComponent params={params} currentQuestionData={currentQuestionData} />;
+  return <QuestionComponent 
+    params={{ testType, questionNumber: questionNumber.toString() }} 
+    currentQuestionData={currentQuestionData} 
+  />;
 } 
