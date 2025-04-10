@@ -55,13 +55,6 @@ const questions: Question[] = [
   },
 ];
 
-export interface PageProps {
-  params: {
-    testType: string;
-    questionNumber: string;
-  };
-}
-
 export async function generateStaticParams() {
   return questions.map((q) => ({
     testType: 'ace',
@@ -69,7 +62,11 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function Page({ params }: PageProps) {
+export default function Page({
+  params,
+}: {
+  params: { testType: string; questionNumber: string };
+}) {
   const questionNumber = parseInt(params.questionNumber, 10);
   const currentQuestionData = questions[questionNumber - 1];
 
