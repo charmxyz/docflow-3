@@ -60,14 +60,15 @@ const questions: Question[] = [
   },
 ];
 
-interface Props {
+type PageProps = {
   params: {
     testType: string;
     questionNumber: string;
   };
-}
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
-export default function Page({ params }: Props) {
+export default function Page({ params }: PageProps) {
   const router = useRouter();
   const testType = params.testType;
   const questionNumber = parseInt(params.questionNumber, 10);
