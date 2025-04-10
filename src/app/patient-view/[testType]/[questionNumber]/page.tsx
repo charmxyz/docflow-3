@@ -1,4 +1,5 @@
 import { QuestionComponent } from './QuestionComponent';
+import { type Metadata } from 'next';
 
 interface Question {
   id: number;
@@ -54,31 +55,26 @@ const questions: Question[] = [
   },
 ];
 
-export async function generateStaticParams() {
-  return [
-    { testType: 'ace', questionNumber: '1' },
-    { testType: 'ace', questionNumber: '2' },
-    { testType: 'ace', questionNumber: '3' },
-    { testType: 'ace', questionNumber: '4' },
-    { testType: 'ace', questionNumber: '5' },
-    { testType: 'ace', questionNumber: '6' },
-    { testType: 'ace', questionNumber: '7' },
-    { testType: 'ace', questionNumber: '8' },
-  ];
+export interface PageProps {
+  params: {
+    testType: string;
+    questionNumber: string;
+  };
 }
 
-export default function Page({
-  params,
-}: {
-  params: { testType: string; questionNumber: string };
-}) {
-  // Use URL parameters with fallback values
-  const testType = params.testType || "ace";
-  const questionNumber = parseInt(params.questionNumber, 10) || 1;
+export async function generateStaticParams() {
+  return questions.map((q) => ({
+    testType: 'ace',
+    questionNumber: q.id.toString(),
+  }));
+}
+
+export default function Page({ params }: PageProps) {
+  const questionNumber = parseInt(params.questionNumber, 10);
   const currentQuestionData = questions[questionNumber - 1];
 
   return <QuestionComponent 
-    params={{ testType, questionNumber: questionNumber.toString() }} 
+    params={{ testType: params.testType, questionNumber: params.questionNumber }} 
     currentQuestionData={currentQuestionData} 
   />;
 } 
