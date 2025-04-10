@@ -54,6 +54,19 @@ const questions: Question[] = [
   },
 ];
 
+export async function generateStaticParams() {
+  return [
+    { testType: 'ace', questionNumber: '1' },
+    { testType: 'ace', questionNumber: '2' },
+    { testType: 'ace', questionNumber: '3' },
+    { testType: 'ace', questionNumber: '4' },
+    { testType: 'ace', questionNumber: '5' },
+    { testType: 'ace', questionNumber: '6' },
+    { testType: 'ace', questionNumber: '7' },
+    { testType: 'ace', questionNumber: '8' },
+  ];
+}
+
 export default function Page({
   params,
 }: {
