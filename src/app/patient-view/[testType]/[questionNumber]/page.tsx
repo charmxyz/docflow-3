@@ -1,5 +1,12 @@
 import { QuestionComponent } from './QuestionComponent';
 
+export type PageProps = {
+  params: {
+    testType: string;
+    questionNumber: string;
+  };
+};
+
 interface Question {
   id: number;
   text: string;
@@ -61,11 +68,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function Page({
-  params,
-}: {
-  params: { testType: string; questionNumber: string };
-}) {
+export default function Page({ params }: PageProps) {
   const questionNumber = parseInt(params.questionNumber, 10);
   const currentQuestionData = questions[questionNumber - 1];
 
