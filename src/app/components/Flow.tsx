@@ -9,10 +9,21 @@ import {
   Panel,
   useNodesState,
   useEdgesState,
+  Node,
+  Edge,
+  Controls,
+  Position,
+  MarkerType,
+  NodeTypes,
+  NodeProps,
+  EdgeProps,
+  Connection
 } from "@xyflow/react";
 import dagre from "@dagrejs/dagre";
 import Image from "next/image";
 import { PlayIcon } from "@heroicons/react/24/solid";
+import { Patient } from "../data/patients";
+import { Node as XYFlowNode, Edge as XYFlowEdge } from '@xyflow/react';
 
 import "@xyflow/react/dist/style.css";
 
@@ -22,7 +33,24 @@ import CustomResultNode from "./CustomResultNode";
 import BiomarkerNode from "./BiomarkerNode";
 import { AnimatedSVGEdge } from "./AnimatedSVGEdge";
 
+// Initialize dagre graph
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
+
+interface CustomNodeData {
+  label: string;
+  initialValue?: string;
+  details?: string;
+  positivePercentage?: number;
+  negativePercentage?: number;
+  [key: string]: any;
+}
+
+interface CustomEdgeData {
+  animated?: boolean;
+}
+
+type CustomNode = Node<CustomNodeData> & { type: string };
+type CustomEdge = Edge<CustomEdgeData> & { type: string };
 
 const nodeWidth = 172;
 const nodeHeight = 108; // Increased height for input nodes
@@ -37,102 +65,131 @@ const edgeTypes = {
   animated: AnimatedSVGEdge,
 };
 
-// Function to hide nodes and edges
-const hide = (hidden: boolean) => (nodeOrEdge: any) => {
-  return {
-    ...nodeOrEdge,
-    hidden,
-  };
-};
-
-const getLayoutedElements = (nodes: any[], edges: any[], direction = "TB") => {
+const getLayoutedElements = (nodes: CustomNode[], edges: CustomEdge[], direction = "TB") => {
   const isHorizontal = direction === "LR";
   dagreGraph.setGraph({ rankdir: direction });
 
+  // Clear the graph
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+  // Add nodes to the graph
   nodes.forEach((node) => {
-    // Use double width for Family History node
-    const width = node.data.label === "Family History" ? nodeWidth * 2 : nodeWidth;
-    dagreGraph.setNode(node.id, { width, height: nodeHeight });
+    dagreGraph.setNode(node.id, { width: 150, height: 50 });
   });
 
+  // Add edges to the graph
   edges.forEach((edge) => {
     dagreGraph.setEdge(edge.source, edge.target);
   });
 
+  // Apply layout
   dagre.layout(dagreGraph);
 
-  const newNodes = nodes.map((node) => {
+  // Get the layout results
+  const layoutedNodes = nodes.map((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
-    const width = node.data.label === "Family History" ? nodeWidth * 2 : nodeWidth;
-    const newNode = {
+    return {
       ...node,
-      targetPosition: isHorizontal ? "left" : "top",
-      sourcePosition: isHorizontal ? "right" : "bottom",
       position: {
-        x: nodeWithPosition.x - width / 2,
-        y: nodeWithPosition.y - nodeHeight / 2,
-      },
+        x: nodeWithPosition.x - 75,
+        y: nodeWithPosition.y - 25
+      }
     };
-
-    return newNode;
   });
 
-  // Log positions for each node
-  console.log("Node Positions:");
-  newNodes.forEach(node => {
-    console.log(`${node.data.label}: x=${Math.round(node.position.x)}, y=${Math.round(node.position.y)}`);
-  });
-
-  return { nodes: newNodes, edges };
+  return { nodes: layoutedNodes, edges };
 };
 
-const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-  initialNodes,
-  initialEdges,
-);
+const updateNodesWithPatientData = (nodes: CustomNode[], patient: Patient | null): CustomNode[] => {
+  return nodes.map(node => {
+    if (node.id === "age") {
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          initialValue: patient ? patient.age.toString() : ""
+        }
+      };
+    }
+    if (node.id === "cognitive") {
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          initialValue: patient ? patient.cognitiveTestResult : ""
+        }
+      };
+    }
+    if (node.id === "family") {
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          initialValue: patient ? patient.familyHistory : ""
+        }
+      };
+    }
+    if (node.id === "output") {
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          label: patient ? `Patient name: ${patient.name}` : "Patient name: David Anderson"
+        }
+      };
+    }
+    return node;
+  });
+};
 
-// Initially hide result and biomarker nodes
-const initialHiddenNodes = layoutedNodes.map(node => {
-  if (
-    node.id === "result" || 
-    node.id === "noAction" || 
-    node.id.startsWith("biomarker")
-  ) {
-    return { ...node, hidden: true };
-  }
-  return node;
-});
-
-// Initially hide edges connected to hidden nodes
-const initialHiddenEdges = layoutedEdges.map(edge => {
-  if (
-    edge.source === "result" || 
-    edge.target === "result" || 
-    edge.source === "noAction" || 
-    edge.target === "noAction" || 
-    edge.source.startsWith("biomarker") || 
-    edge.target.startsWith("biomarker")
-  ) {
-    return { ...edge, hidden: true };
-  }
-  return edge;
-});
-
-const Flow = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialHiddenNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialHiddenEdges);
-  const [animationStep, setAnimationStep] = useState(0);
+export default function Flow({ patient }: { patient: Patient | null }) {
+  const [nodes, setNodes, onNodesChange] = useNodesState<CustomNode[]>(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<CustomEdge[]>(initialEdges);
+  const [layoutDirection, setLayoutDirection] = useState("TB");
   const [isCalculating, setIsCalculating] = useState(false);
+  const [showBiomarkers, setShowBiomarkers] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const [showNoAction, setShowNoAction] = useState(false);
+  const [animationStep, setAnimationStep] = useState(0);
+  const [animationComplete, setAnimationComplete] = useState(false);
+  const [isFlowReady, setIsFlowReady] = useState(false);
+
+  // Initialize nodes and edges with patient data
+  useEffect(() => {
+    const updatedNodes = updateNodesWithPatientData(initialNodes, patient);
+    const layoutedElements = getLayoutedElements(updatedNodes, initialEdges, layoutDirection);
+    
+    // Initially hide result and biomarker nodes
+    const initialHiddenNodes = layoutedElements.nodes.map(node => {
+      if (node.id === "result" || node.id === "noAction" || node.id.startsWith("biomarker")) {
+        return { ...node, hidden: true };
+      }
+      return node;
+    });
+
+    // Initially hide edges connected to hidden nodes
+    const initialHiddenEdges = layoutedElements.edges.map(edge => {
+      if (
+        edge.source === "result" || 
+        edge.target === "result" || 
+        edge.source === "noAction" || 
+        edge.target === "noAction" || 
+        edge.source.startsWith("biomarker") || 
+        edge.target.startsWith("biomarker")
+      ) {
+        return { ...edge, hidden: true };
+      }
+      return edge;
+    });
+
+    setNodes(initialHiddenNodes);
+    setEdges(initialHiddenEdges);
+    setIsFlowReady(true);
+  }, [patient, layoutDirection]);
 
   const onConnect = useCallback(
-    (params: any) =>
-      setEdges((eds) =>
-        addEdge(
-          { ...params, type: ConnectionLineType.SmoothStep, animated: true },
-          eds,
-        ),
-      ),
-    [],
+    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
   );
 
   const onLayout = useCallback(
@@ -272,6 +329,4 @@ const Flow = () => {
       </ReactFlow>
     </div>
   );
-};
-
-export default Flow; 
+} 

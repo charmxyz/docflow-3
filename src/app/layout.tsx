@@ -5,11 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Cogni | Alzheimers Disease Assistance for Healthworker",
-  description: "Interactive dementia risk assessment tool for healthcare providers",
-  icons: {
-    icon: "/icon.png",
-  },
+  title: "Cogni - Dementia Risk Assessment",
+  description: "Interactive dementia risk assessment tool",
 };
 
 export default function RootLayout({

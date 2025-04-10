@@ -1,4 +1,4 @@
-# DocFlow: Interactive Dementia Risk Assessment Tool
+# Cogni: Interactive Dementia Risk Assessment Tool
 
 ## Problem
 
@@ -14,7 +14,7 @@ Dementia is a complex condition with multiple risk factors and biomarkers that c
 
 ## Solution
 
-DocFlow is an interactive flow diagram tool that visualizes the dementia risk assessment process. It:
+Cogni is an interactive flow diagram tool that visualizes the dementia risk assessment process. It:
 
 1. **Visualizes the assessment flow**: Creates a clear, step-by-step visualization of how different inputs contribute to dementia risk assessment.
 
@@ -56,7 +56,7 @@ DocFlow is an interactive flow diagram tool that visualizes the dementia risk as
 
 ## Technical Implementation
 
-DocFlow is built using:
+Cogni is built using:
 - Next.js for the frontend framework
 - React Flow for the interactive diagram
 - Dagre for automatic layout of the flow diagram
