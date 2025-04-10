@@ -1,9 +1,10 @@
 import { QuestionComponent } from './QuestionComponent';
+import { Metadata } from 'next';
 
 interface Question {
   id: number;
   text: string;
-  type: "text" | "image";
+  type: 'text' | 'image';
   image?: string;
 }
 
@@ -54,11 +55,14 @@ const questions: Question[] = [
   },
 ];
 
-export default function Page({
-  params,
-}: {
-  params: { testType: string; questionNumber: string }
-}) {
+type PageProps = {
+  params: {
+    testType: string;
+    questionNumber: string;
+  };
+};
+
+export default function Page({ params }: PageProps) {
   const questionNumber = parseInt(params.questionNumber, 10);
   const currentQuestionData = questions[questionNumber - 1];
 
