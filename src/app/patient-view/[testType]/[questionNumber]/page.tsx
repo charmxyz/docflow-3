@@ -60,14 +60,15 @@ const questions: Question[] = [
   },
 ];
 
-export default function QuestionPage({
+export default function Page({
   params,
 }: {
   params: { testType: string; questionNumber: string };
 }) {
+  const testType = params.testType;
+  const questionNumber = parseInt(params.questionNumber, 10);
   const router = useRouter();
-  const currentQuestion = parseInt(params.questionNumber);
-  const currentQuestionData = questions[currentQuestion - 1];
+  const currentQuestionData = questions[questionNumber - 1];
   const [currentPage, setCurrentPage] = useState(1);
   const questionsPerPage = 25;
   const totalPages = Math.ceil(100 / questionsPerPage);
@@ -81,7 +82,7 @@ export default function QuestionPage({
       <div className="w-3/4 pr-8">
         <div className="bg-white shadow rounded-lg p-6 h-full">
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Question {currentQuestion}</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Question {questionNumber}</h2>
             <p className="text-lg text-gray-700">{currentQuestionData.text}</p>
             {currentQuestionData.type === "image" && currentQuestionData.image && (
               <div className="flex justify-center">
@@ -104,14 +105,14 @@ export default function QuestionPage({
             </div>
             <div className="flex justify-between pt-4">
               <button
-                onClick={() => router.push(`/patient-view/${params.testType}/${currentQuestion - 1}`)}
-                disabled={currentQuestion === 1}
+                onClick={() => router.push(`/patient-view/${testType}/${questionNumber - 1}`)}
+                disabled={questionNumber === 1}
                 className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
               <button
-                onClick={() => router.push(`/patient-view/${params.testType}/${currentQuestion + 1}`)}
+                onClick={() => router.push(`/patient-view/${testType}/${questionNumber + 1}`)}
                 className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Next
@@ -129,9 +130,9 @@ export default function QuestionPage({
             {Array.from({ length: endQuestion - startQuestion + 1 }, (_, i) => startQuestion + i).map((number) => (
               <Link
                 key={number}
-                href={`/patient-view/${params.testType}/${number}`}
+                href={`/patient-view/${testType}/${number}`}
                 className={`flex items-center justify-center h-10 w-10 rounded-md text-sm font-medium ${
-                  number === currentQuestion
+                  number === questionNumber
                     ? "bg-blue-600 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
