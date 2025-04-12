@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "DocFlow",
-  description: "Document Management System",
+  title: "Cogni - Dementia Risk Assessment",
+  description: "Interactive dementia risk assessment tool",
   icons: {
     icon: "/icon.png",
   },
